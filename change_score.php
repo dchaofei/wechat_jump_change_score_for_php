@@ -16,8 +16,8 @@ Class ChangeScore
 
     public function __construct()
     {
-        $configs = require './config.php';
-        $this->score = $configs['score'];
+        $configs          = require './config.php';
+        $this->score      = $configs['score'];
         $this->session_id = $configs['session_id'];
 
         $this->req = [
@@ -60,7 +60,6 @@ Class ChangeScore
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         $res = curl_exec($ch);
         curl_close($ch);
-        //var_dump($this->base_req);exit;
         return json_decode($res, true);
     }
 
@@ -134,12 +133,11 @@ Class ChangeScore
             ]),
         ];
 
-
         $this->base_req = $this->extend(array_merge([
             "action_data" => $this->encrypt($data, $this->session_id),
         ], $this->req));
 
-        $res = $this->request($this->returnUrl());
+        $res      = $this->request($this->returnUrl());
         $userInfo = $this->getUserInfo()['my_user_info'];
 
         if ($res['base_resp']['errcode'] == 0) {
