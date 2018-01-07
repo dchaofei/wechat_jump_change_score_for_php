@@ -9,10 +9,14 @@ Class ChangeScore
     private $base_site = "https://mp.weixin.qq.com/wxagame/";
     private $path = '';
     private $version = 9;
-    private $times = 258;
+    private $times = 265;
+    private $startTime;
+    private $endTime;
     private $header;
-    private $action = [], $musicList = [], $touchList = [];
+    private $action = [], $musicList = [], $touchList = [], $data = [];
+    private $steps = [], $touchMoveList = [], $timestamp = [], $game_data = [];
     private $req = [];
+    private $bestscore;
 
     public function __construct()
     {
@@ -27,10 +31,15 @@ Class ChangeScore
             ],
         ];
 
+        //$this->times = rand(100, 300);
+
         $this->base_req = $this->extend($this->req);
+        $this->times = $this->getUserInfo()['my_user_info']['times'] + 1;
+        //var_dump($this->getUserInfo()['my_user_info']);exit;
         $this->path     = 'wxagame_settlement';
         $this->simulationSteps();
         $this->changeScore();
+        $this->bottlereport();
 
 
     }
@@ -101,11 +110,153 @@ Class ChangeScore
 
     private function simulationSteps()
     {
-        for ($i = round(10000 + lcg_value(0, 1) * 2000); $i > 0; $i--) {
+        /*for ($i = round(10000 + lcg_value(0, 1) * 2000); $i > 0; $i--) {
             array_push($this->action, [number_format(lcg_value(0, 1), 3), number_format(lcg_value(0, 1) * 2, 2), $i / 5000 == 0 ? true : false]);
             array_push($this->musicList, false);
             array_push($this->touchList, [number_format((250 - lcg_value(0, 1) * 10), 4), number_format((670 - lcg_value(0, 1) * 20), 4)]);
+        }*/
+        $currentScore = 0;
+        $perScore = 1;
+        $addScore = 0;
+        $succeedTime = 0;
+        $mouseDownTime;
+        $order = 15;
+        $StayTime;
+        $musicScore = false;
+        $OrderList = [];
+        $IsDouble = [];
+        $Count = 0;
+
+        for ($i = 0; $i < 100; $i++) {
+            if ($i < 60) {
+                array_push($OrderList, 15);
+                array_push($IsDouble, false);
+            } else {
+                if ($i < 78) {
+                    array_push($IsDouble, false);
+                    array_push($OrderList, 26);
+                } elseif ($i < 86) {
+                    array_push($IsDouble, false);
+                    array_push($OrderList, 17);
+                } elseif ($i < 95) {
+                    array_push($IsDouble, true);
+                    array_push($OrderList, 24);
+                } else {
+                    array_push($IsDouble, true);
+                    array_push($OrderList, 19);
+                }
+            }
         }
+
+        $startTime = time();
+
+        do {
+            $stoptime = rand(200, 500);
+            $t = rand(300, 1000);
+            $d = lcg_value(0, 1) * 4 / 1000 + 1.88;
+            $duration = $t / 1000;
+            $o = rand(0, 99);
+            $order = $OrderList[$o];
+            if ($order != 15) {
+                if ($Count < 4) {
+                    $order = 15;
+                    $StayTime = 0;
+                } else {
+                    $musicScore = true;
+                    $StayTime = rand(2000, 3000);
+                }
+            } else {
+                $perScore = 1;
+            }
+
+            $calY = round(2.75 - $d * $duration, 2);
+            array_push($this->action, [$duration, $calY, false]);
+            array_push($this->musicList, $musicScore);
+            $x = rand(230, 245);
+            $y = rand(500, 530);
+
+            $touch_x = $x + ($x % 4) * 0.25;
+            $touch_y = $y + ($y % 4) * 0.25;
+            array_push($this->touchList, [$touch_x, $touch_y]);
+
+            if ($t < 410) {
+                for ($l = 0; $l < 3; $l++) {
+                    array_push($this->touchMoveList, $touch_x);
+                    array_push($this->touchMoveList, $touch_y);
+                }
+            } elseif ($t < 450) {
+                for ($l = 0; $l < 4; $l++) {
+                    array_push($this->touchMoveList, $touch_x);
+                    array_push($this->touchMoveList, $touch_y);
+                }
+            } else {
+                for ($l = 0; $l < 5; $l++) {
+                    array_push($this->touchMoveList, $touch_x);
+                    array_push($this->touchMoveList, $touch_y);
+                }
+            }
+
+            array_push($this->steps, $this->touchMoveList);
+
+            if ($succeedTime == 0) {
+                $succeedTime = $startTime;
+            }
+
+            $WaitTime = rand(1000, 3000);
+
+            $mouseDownTime = $succeedTime + $StayTime + $WaitTime;
+
+            array_push($this->timestamp, $mouseDownTime);
+
+            $succeedTime = $mouseDownTime + round((135 + 15 * $duration) * 2000 / 720) + $t;
+
+            switch ($order) {
+                case 26:
+                        $addScore=5;
+                        break;
+                case 17:
+                        $addScore = 10;
+                        break;
+                case 24:
+                        $addScore = 15;
+                        break;
+                case 19:
+                        $addScore = 30;
+                        break;
+                default:
+                        $addScore=0;
+                        break;
+            }
+
+            $currentScore = $currentScore + $perScore+$addScore;
+            $Count ++;
+        } while ($currentScore <= $this->score);
+
+        $s = $this->timestamp[$Count - 1] - $startTime + 200;
+
+        for ($i = 0; $i < $Count; $i++) {
+            $this->timestamp[$i] = $this->timestamp[$i] - $s;
+        }
+
+        $this->startTime  = $startTime - $s;
+        $this->endTime = $succeedTime - $s;
+
+        $seed = $startTime - $s;
+        $this->game_data = json_encode([
+            "seed" => $seed,
+            "version"   => 2 ,
+            "timestamp" => $this->timestamp,
+            "action" => $this->action,
+            "musicList" => $this->musicList,
+            "touchList" => $this->touchList,
+            "steps" => $this->steps,
+        ]);
+
+        $this->data = [
+            "score"     => $this->score,
+            "times"     => $this->times,
+            'game_data' => $this->game_data,
+        ];
     }
 
     private function returnUrl()
@@ -119,9 +270,39 @@ Class ChangeScore
         return $this->request($this->returnUrl());
     }
 
+    private function bottlereport()
+    {
+        $base_req = [
+            "session_id" => $this->session_id,
+        ];
+        $ts1 = round((float)$this->startTime / 1000);
+        $ts2 = round((float)$this->endTime / 1000);
+        $this->base_req = json_encode([
+            "base_req" => $base_req,
+            "report_list" => [
+                [
+                    "ts" => $ts1,
+                    "type" => 10,
+                ],
+                [
+                    "ts" => $ts2,
+                    "type" => 2,
+                    "duration" => $ts2 - $ts1,
+                    "best_score" => $this->bestscore,
+                    "times" => $this->times,
+                    "score" => $this->score,
+                    "break_record" => $this->score > $this->bestscore ? 1 : 0,
+                ],
+            ],
+        ]);
+
+        $this->path = 'wxagame_bottlereport';
+        return $this->request($this->returnUrl());
+    }
+
     private function changeScore()
     {
-        $data = [
+        /*$data = [
             "score"     => $this->score,
             "times"     => $this->times,
             "game_data" => json_encode([
@@ -131,14 +312,17 @@ Class ChangeScore
                 "touchList" => $this->touchList,
                 "version"   => 1,
             ]),
-        ];
+        ];*/
 
         $this->base_req = $this->extend(array_merge([
-            "action_data" => $this->encrypt($data, $this->session_id),
+            "action_data" => $this->encrypt($this->data, $this->session_id),
         ], $this->req));
 
         $res      = $this->request($this->returnUrl());
+        var_dump($res);
         $userInfo = $this->getUserInfo()['my_user_info'];
+        $this->bestscore = $userInfo['history_best_score'];
+        var_dump($userInfo);
 
         if ($res['base_resp']['errcode'] == 0) {
             echo "修改成功" . PHP_EOL;
