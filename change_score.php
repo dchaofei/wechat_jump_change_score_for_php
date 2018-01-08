@@ -173,7 +173,16 @@ Class ChangeScore
 
         do {
             $stoptime = rand(200, 500);
-            $t = rand(300, 1000);
+
+            $WaitTime = rand(1000, 3000);
+
+            usleep($WaitTime * 100);
+
+            $touchStartTime = time();
+
+            $t = rand(300, 1000);//按压时间
+            usleep($t * 100);
+
             $d = lcg_value(0, 1) * 4 / 1000 + 1.88;
             $duration = $t / 1000;
             $o = rand(0, 99);
@@ -184,11 +193,24 @@ Class ChangeScore
                     $StayTime = 0;
                 } else {
                     $musicScore = true;
-                    $StayTime = rand(2000, 3000);
+                    $StayTime = rand(2100, 2300);
+                }
+            } else {
+                $StayTime = 0;
+            }
+
+            if ($IsDouble[$o]) {
+                if ($Count < 1) {
+                    $perScore = 1;
+                } else {
+                    $perScore = $perScore * 2 > 32 ? 32 : $perScore * 2;
                 }
             } else {
                 $perScore = 1;
             }
+
+            usleep($StayTime * 100);
+            usleep(round((135 + 15 * $duration) * 2000 / 720) * 100);
 
             $calY = round(2.75 - $d * $duration, 2);
             array_push($this->action, [$duration, $calY, false]);
@@ -223,13 +245,15 @@ Class ChangeScore
                 $succeedTime = $startTime;
             }
 
-            $WaitTime = rand(1000, 3000);
 
-            $mouseDownTime = $succeedTime + $StayTime + $WaitTime;
+            //$mouseDownTime = $succeedTime + $StayTime + $WaitTime;
 
-            array_push($this->timestamp, $mouseDownTime);
+            //array_push($this->timestamp, $mouseDownTime);
+            array_push($this->timestamp, $touchStartTime);
 
-            $succeedTime = $mouseDownTime + round((135 + 15 * $duration) * 2000 / 720) + $t;
+            //$succeedTime = $mouseDownTime + round((135 + 15 * $duration) * 2000 / 720) + $t;
+
+            $succeedTime = time();
 
             switch ($order) {
                 case 26:
@@ -251,7 +275,7 @@ Class ChangeScore
 
             $currentScore = $currentScore + $perScore+$addScore;
             $Count ++;
-            usleep(900 * 1000);
+            //usleep(400 * 1000);
         } while ($currentScore <= $this->score);
 
         $s = $this->timestamp[$Count - 1] - $startTime + 200;
@@ -263,7 +287,8 @@ Class ChangeScore
         $this->startTime  = $startTime - $s;
         $this->endTime = $succeedTime - $s;
 
-        $seed = $startTime - $s;
+        //$seed = $startTime - $s;
+        $seed = $startTime;
         $this->game_data = json_encode([
             "seed" => $seed,
             "version"   => 2 ,
