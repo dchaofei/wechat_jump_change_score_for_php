@@ -8,7 +8,7 @@ Class ChangeScore
 
     private $base_site = "https://mp.weixin.qq.com/wxagame/";
     private $path = '';
-    private $version = 9;
+    private $version = 6;
     private $times = 265;
     private $startTime;
     private $endTime;
@@ -32,10 +32,17 @@ Class ChangeScore
         ];
 
         //$this->times = rand(100, 300);
+        $version = [
+            '3' => 3,
+            '6' => 6,
+            '9' => 9,
+        ];
+        $this->version = array_rand($version);
+        var_dump($this->version);
 
         $this->base_req = $this->extend($this->req);
         $this->times = $this->getUserInfo()['my_user_info']['times'] + 1;
-        //var_dump($this->getUserInfo()['my_user_info']);exit;
+        //var_dump($this->getUserInfo());exit;
         $this->path     = 'wxagame_settlement';
         $this->simulationSteps();
         $this->changeScore();
