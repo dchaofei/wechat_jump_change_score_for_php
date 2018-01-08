@@ -8,7 +8,7 @@ Class ChangeScore
 
     private $base_site = "https://mp.weixin.qq.com/wxagame/";
     private $path = '';
-    private $version = 6;
+    private $version = 9;
     private $times = 265;
     private $startTime;
     private $endTime;
@@ -30,17 +30,19 @@ Class ChangeScore
                 "fast"       => 1,
             ],
         ];
+        $str = "663jRbaiH40McEi+7LDMGmvuuB64dpusnavXAXLXGVrmJRPRqNBBU+9zj7PaZyrw0zFdlHVoZdgjgJLvaayKPBNjoKcDWEVwhQv0NQRzPf7PnkmIdAMNAXkkW3X+ag2/EMkxB5K4S9uoB5JJneroJ6cSYgj9GWfkrddxA5Y/QihC9lELeW0OfxMdOKcBxeiTSAqZq3cJ7kAVcRlRGmsIfYPmLNlr8iQEbQHz4dUL6hw82QWTibNWIjmU1WuQ8+h4PlgH01nzxRW4gFQ7TlybRvpyYtb8psVmBWkcFWfZ/dUk4sEzVntg49JOfdBBlXVTidNgsPTytOBj9xnfQxwX0k+OvjM9MG7grHTWPUAkixOeqUe+r6AMURMQCg9WIBiGuBfV9EJHMbZkvBlfgT4/BoJY71lKzgPqRjVJtWHttzZ3MRq+utRtb6h4F1ZNgKCx65qvVpVR1BP4uoTTjLd6P/e3S+8+WmjMDuhARRTEW12GOKO3Qdx8G3AWEphz8Cf7FLJ+ZwHHNIZL+f74/WVP0dE3nMNhWFKB+GsLJQPH6kCh3FBrm3QgkgOPAgQ7s6NbjvZGCeg8ClhDz/6S5VqOMR2h+E7Ua2E2+k4eJBjH4BXUXf0uIHwUJBYbALDo5lbKl4JxCF3cQBG1LlzEbp7YaT8OxTyllQjiJK0ctNEgwWjt4E4TzeITPj/hiOxSvrLMkeXI1bVr52orMiDVjbpk7ZwXY8xWLeR+NNDH3VrfexmtzIxXLJblYgDYlKnQMPsFMIBGYngbgbhc8xx6Sc6jeW+B92enBeRUpnOpo/+16wPEoW/TtxYFUGNEgx0qWcUITAaXCTqHP3F7RIATehNsgXrmqKJEoWCr8HXbZCuL9pNw32nndlfmUKY641Cs6CGcrnzB8yuXfB9k2/sZMnkb/zQvjipapD9MaCxYb2KFdciozFAc2RE45imM7ziFxb0S7IoiOBaX8VmmctZGg8AG59YRd9aKCyyLHMdVUSwLKwD8VAWIzhWo+FFgwoYsLNl84aTJq+v7L6rZc50iPyFvnnK7Gg0rlqh6C6ZdF4ELwqcRscZSPsUqlwSqxpo8dA5RnVsplQTDZBxqGNpbgFXxzWfwWEacdFNfygYp7/j3H4Ay+8nys4S+HdVEPbSPqtUONwLmz0ovn1WkXso4CrDElNmclBLibUYyKCJuOQQdCli8BllsEo4EGmlUC/TC2xb7wtFzoPtoThU2egFAFLsqdvzuPtVGt+2OiNI0xAbMigHPggBcn8oiie+eECO9DNlxOhayIRNr+JTca8QUOh7eHwZR7OacFn/w8+9BA8iVpiOJdXg7r4a0mhfqy89Sg1Lbw2DFEFdMEbgFdjtxF+WQV+hl49vN7/coZcnbzfSBbam1T/02f+WnOgyEFvDx7QDjDq7VCjGMLviGWiV9C4L+S7iUFyWlQABl5oK2wnKCq5KvehBB9ouc6y3VlaOTfnM6fOk5qcwIjCD2h97G0U2Qw/2IjwzPF6B4Isk3gzMTGJy/rsKluuOMxK8qR+XaluPi6bDG8gNrbCubBtJL7seK0nQJKMFZUA/lqRY+JAMaK1hKu1iPISFMUTXcHGWJOVWJC2oO8NM0bxXuTTAOkqd2WRNlZAQ7+SgtChc0xiEeH7hf4mJ3johvDbdxf3LEYayO2uQ7AREnVHggF+IFmKQYQu+YwEsdIkPEQGpHjpK4qop6N5i7/r6MrnPFxpxRootAfQOrWFB3E/vqrpjCSz4lQEsi8KxUYCLXYPg/b9FM+DGipO752+rcPMRPIlS3bYtUE0kYSEXqenI/6n9pwEzXtUv6OyYwJaqw6KGhYjBgslylfL2sskH5qm2y5yxvAue982IUf/au/tkpBF55IL4/ZKQdJKbYN3DbwxkUa/di6tmnvczDvpKMBXIH8KmuM1+b";
 
         //$this->times = rand(100, 300);
-        $version = [
+        /*$version = [
             '3' => 3,
             '6' => 6,
             '9' => 9,
         ];
         $this->version = array_rand($version);
-        var_dump($this->version);
+        var_dump($this->version);*/
 
         $this->base_req = $this->extend($this->req);
+        //$this->decrypt($str, $this->session_id);
         $this->times = $this->getUserInfo()['my_user_info']['times'] + 1;
         //var_dump($this->getUserInfo());exit;
         $this->path     = 'wxagame_settlement';
@@ -108,6 +110,18 @@ Class ChangeScore
         $crypttext = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $data, MCRYPT_MODE_CBC, $iv);
         $res       = base64_encode($crypttext);
         return $res;
+    }
+
+    private function decrypt($data, $originKey) {
+        //$data      = str_replace("\\\\", "\\", json_encode($data, JSON_UNESCAPED_SLASHES));
+        $originKey = substr($originKey, 0, 16);
+        $key       = $originKey;
+        $iv        = $originKey;
+        $data = base64_decode($data);
+        $res = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $data, MCRYPT_MODE_CBC, $iv);
+        //$res = base64_encode($res);
+        echo $res;
+        exit;
     }
 
     private function extend($data)
@@ -237,6 +251,7 @@ Class ChangeScore
 
             $currentScore = $currentScore + $perScore+$addScore;
             $Count ++;
+            usleep(900 * 1000);
         } while ($currentScore <= $this->score);
 
         $s = $this->timestamp[$Count - 1] - $startTime + 200;
