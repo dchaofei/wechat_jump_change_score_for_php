@@ -284,8 +284,11 @@ Class ChangeScore
             $this->timestamp[$i] = $this->timestamp[$i] - $s;
         }
 
-        $this->startTime  = $startTime - $s;
-        $this->endTime = $succeedTime - $s;
+        //$this->startTime  = $startTime - $s;
+        //$this->endTime = $succeedTime - $s;
+
+        $this->startTime  = $startTime;
+        $this->endTime = $succeedTime;
 
         //$seed = $startTime - $s;
         $seed = $startTime;
