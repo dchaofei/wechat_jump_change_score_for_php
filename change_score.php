@@ -32,12 +32,12 @@ Class ChangeScore
         ];
 
         //$this->times = rand(100, 300);
-        $version = [
+        /*$version = [
             '3' => 3,
             '6' => 6,
             '9' => 9,
-        ];
-        $this->version = array_rand($version);
+        ];*/
+        //$this->version = array_rand($version);
         var_dump($this->version);
 
         $this->base_req = $this->extend($this->req);
@@ -59,7 +59,8 @@ Class ChangeScore
     public function request($url)
     {
         $this->header = [
-            "User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 11_2_1 like Mac OS X) AppleWebKit/604.4.7 (KHTML, like Gecko) Mobile/15C153 MicroMessenger/6.6.1 NetType/WIFI Language/zh_CN",
+            //"User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 11_2_1 like Mac OS X) AppleWebKit/604.4.7 (KHTML, like Gecko) Mobile/15C153 MicroMessenger/6.6.1 NetType/WIFI Language/zh_CN",
+            "User-Agent: MicroMessenger/6.6.1.1220(0x26060134) NetType/4G Language/zh_CN",
             "Referer: https://servicewechat.com/wx7c8d593b2c3a7703/{$this->version}/page-frame.html",
             "Content-Type: application/json",
             "Accept-Language: zh-cn",
@@ -281,6 +282,13 @@ Class ChangeScore
     {
         $base_req = [
             "session_id" => $this->session_id,
+            "fast" => 1,
+            "client_info" => [
+                "platform" => "android",
+                "brand" => "SMARTISAN",
+                "model" => "SM901",
+                "system" => "Android 6.0.1"
+            ]
         ];
         $ts1 = round((float)$this->startTime / 1000);
         $ts2 = round((float)$this->endTime / 1000);
@@ -289,7 +297,8 @@ Class ChangeScore
             "report_list" => [
                 [
                     "ts" => $ts1,
-                    "type" => 10,
+                    "type" => 0,
+                    "scene" => 1089,
                 ],
                 [
                     "ts" => $ts2,
